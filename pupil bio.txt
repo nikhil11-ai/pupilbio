@@ -6,7 +6,7 @@ import seaborn as sns
 
 # Load the dataset (update the file name with the actual path)
 try:
-    df = pd.read_csv(r"C:\Users\hp\Desktop\PupilBioTest_PMP_revA(data-1).csv")  # Replace with your dataset file path
+    df = pd.read_csv(r"C:\Users\hp\Desktop\PupilBioTest_PMP_revA(data-1).csv")  
 except FileNotFoundError:
     print("Error: File not found. Please check the file path.")
     exit()
@@ -85,7 +85,7 @@ import seaborn as sns
 
 # Load the dataset (update the file name with the actual path)
 try:
-    df = pd.read_csv(r"C:\Users\hp\Desktop\PANCAN_PDAC_100plex_ref(data-2).csv")  # Replace with your dataset file path
+    df = pd.read_csv(r"C:\Users\hp\Desktop\PANCAN_PDAC_100plex_ref(data-2).csv")  
 except FileNotFoundError:
     print("Error: File not found. Please check the file path.")
     exit()
