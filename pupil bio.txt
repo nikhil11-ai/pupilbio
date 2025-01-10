@@ -1,0 +1,135 @@
+# Import required libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset (update the file name with the actual path)
+try:
+    df = pd.read_csv(r"C:\Users\hp\Desktop\PupilBioTest_PMP_revA(data-1).csv")  # Replace with your dataset file path
+except FileNotFoundError:
+    print("Error: File not found. Please check the file path.")
+    exit()
+
+# Clean column names
+df.columns = df.columns.str.strip().str.replace('`', '', regex=False)
+print("Cleaned Columns:", df.columns)
+
+# Task 1: Summarize CpG coverage across tissue types
+if 'Tissue' in df.columns and '000' in df.columns:
+    # Calculate total coverage across all CpG states (000 to 111)
+    coverage_columns = ['000', '001', '010', '011', '100', '101', '110', '111']
+    df['Total_Coverage'] = df[coverage_columns].sum(axis=1)
+
+    # Aggregate statistics per tissue
+    coverage_summary = df.groupby('Tissue')['Total_Coverage'].agg(
+        Median_Coverage='median',
+        Mean_Coverage='mean',
+        Coverage_CV=lambda x: np.std(x) / np.mean(x)
+    )
+    print("Coverage Summary by Tissue:")
+    print(coverage_summary)
+
+    # Plot coverage summary
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(data=df, x='Tissue', y='Total_Coverage')
+    plt.title('Total Coverage Distribution by Tissue')
+    plt.xlabel('Tissue Type')
+    plt.ylabel('Total Coverage')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+else:
+    print("Error: Columns 'Tissue' or coverage states (000 to 111) are missing.")
+
+# Task 2: Count unique CpG coordinates per tissue
+if 'CpG_Coordinates' in df.columns and 'Tissue' in df.columns:
+    unique_cpg_count = df.groupby('Tissue')['CpG_Coordinates'].nunique()
+    print("Unique CpG Coordinates Count by Tissue:")
+    print(unique_cpg_count)
+
+    # Bar plot for unique CpG count
+    plt.figure(figsize=(10, 6))
+    unique_cpg_count.plot(kind='bar', color='skyblue')
+    plt.title('Unique CpG Coordinates Count by Tissue')
+    plt.xlabel('Tissue Type')
+    plt.ylabel('Unique CpG Count')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+else:
+    print("Error: Columns 'CpG_Coordinates' or 'Tissue' are missing.")
+
+# Task 3: Generate detailed CpG coverage statistics
+if 'CpG_Coordinates' in df.columns:
+    cpg_stats = df.groupby('CpG_Coordinates')['Total_Coverage'].describe()
+    print("CpG Coverage Statistics:")
+    print(cpg_stats)
+
+    # Histogram of Total Coverage
+    plt.figure(figsize=(10, 6))
+    plt.hist(df['Total_Coverage'], bins=20, color='lightgreen', edgecolor='black')
+    plt.title('Distribution of Total CpG Coverage')
+    plt.xlabel('Total Coverage')
+    plt.ylabel('Frequency')
+    plt.tight_layout()
+    plt.show()
+else:
+    print("Error: Column 'CpG_Coordinates' is missing.")
+
+
+# Import required libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the dataset (update the file name with the actual path)
+try:
+    df = pd.read_csv(r"C:\Users\hp\Desktop\PANCAN_PDAC_100plex_ref(data-2).csv")  # Replace with your dataset file path
+except FileNotFoundError:
+    print("Error: File not found. Please check the file path.")
+    exit()
+
+# Clean column names
+df.columns = df.columns.str.strip()
+print("Cleaned Columns:", df.columns)
+
+# Task 2: NGS Data Analysis
+
+# Quality Control
+def quality_control(df):
+    print(f"Summary of data:\n{df.describe()}")
+    sns.pairplot(df)
+    plt.suptitle('Pairplot of NGS Data', y=1.02)
+    plt.show()
+
+# Mutation Calling
+def mutation_calling(df):
+    # Simplified mutation detection logic based on differences between normal and tumor samples
+    normal_sample = df[df['Gene'] == 'TP53']  # Example: Normal sample
+    tumor_sample = df[df['Gene'] == 'KRAS']  # Example: Tumor sample
+
+    # Identify mutations in tumor_sample not present in normal_sample
+    mutations = tumor_sample[~tumor_sample['Absolute Start'].isin(normal_sample['Absolute Start'])]
+    print(f"Identified mutations: {mutations}")
+
+    plt.figure(figsize=(10, 6))
+    sns.countplot(data=mutations, x='Gene', order=mutations['Gene'].value_counts().index)
+    plt.title('Mutations Identified in Tumor Sample')
+    plt.xlabel('Gene')
+    plt.ylabel('Count')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+# Perform quality control
+if not df.empty:
+    quality_control(df)
+else:
+    print("Error: Dataframe is empty. Please check the data.")
+
+# Call mutations
+if 'Absolute Start' in df.columns and 'Gene' in df.columns:
+    mutation_calling(df)
+else:
+    print("Error: Required columns 'Absolute Start' or 'Gene' are missing.")
